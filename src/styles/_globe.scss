@@ -1,6 +1,5 @@
 svg {
-  display: block;
-  margin: auto;
+  float: right;
 }
 
 #sphere {
@@ -19,6 +18,10 @@ svg {
   stroke: black;
   stroke-width: 1;
   fill: none;
+}
+
+#tabs line {
+  stroke: grey;
 }
 
 .links path {

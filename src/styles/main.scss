@@ -1,1 +1,18 @@
+body {
+  font-family: monospace;
+}
+
+.side {
+  position: absolute;
+  left: 1rem;
+}
+
+.svg-container {
+  padding-top: 10%;
+}
+
 @import "globe";
+@import "header";
+@import "howto";
+@import "settings";
+@import "footer";

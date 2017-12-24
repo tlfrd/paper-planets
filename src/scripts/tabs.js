@@ -11,28 +11,26 @@ var generateCutOutTab = function(svg, line1, outDistance, inDistance, direction)
   var point1 = calcPointOnLine(newLine, inDistance),
       point2 = calcPointOnLine(newLine, 1 - inDistance);
 
-  var tab = svg.append("g");
+  var tab = svg.append("g")
+    .attr("id", "tabs")
 
   var line2 = tab.append("line")
     .attr("x1", point1.x)
     .attr("y1", point1.y)
     .attr("x2", point2.x)
-    .attr("y2", point2.y)
-    .style("stroke", "red");
+    .attr("y2", point2.y);
 
   var connector1 = tab.append("line")
     .attr("x1", line1[0].x)
     .attr("y1", line1[0].y)
     .attr("x2", point1.x)
-    .attr("y2", point1.y)
-    .style("stroke", "red");
+    .attr("y2", point1.y);
 
   var connector2 = tab.append("line")
     .attr("x1", line1[1].x)
     .attr("y1", line1[1].y)
     .attr("x2", point2.x)
-    .attr("y2", point2.y)
-    .style("stroke", "red");
+    .attr("y2", point2.y);
 }
 
 function calcLineTranslation(distance, line1, direction) {

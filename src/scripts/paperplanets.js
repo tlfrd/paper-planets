@@ -13,7 +13,7 @@ var ratio = 1.92;
 var maxWidth = 1500,
   maxHeight = maxWidth / ratio;
 
-d3.json('/static/countries.geojson', function(err, world) {
+d3.json('static/countries.geojson', function(err, world) {
 
   var width = Math.min(window.innerWidth * 0.8, maxWidth),
     height = Math.min(width / ratio, maxHeight);
@@ -162,7 +162,7 @@ d3.json('/static/countries.geojson', function(err, world) {
   var tabsG = svg.append('g');
   var tabSize = width / 100;
 
-  d3.json('/static/tabs.json', function(err2, t) {
+  d3.json('static/tabs.json', function(err2, t) {
     t.tabs.forEach(tab => {
 
       var projected1 = projection(tab.coordinates[0]),

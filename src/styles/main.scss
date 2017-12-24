@@ -1,5 +1,25 @@
+// Mobile content area width
+$on-palm: 600px;
+
+// Define media-query
+@mixin media-query($device) {
+  @media screen and (max-width: $device) {
+    @content;
+  }
+}
+
+html {
+  font-size: 100%;
+}
+
 body {
   font-family: monospace;
+}
+
+@include media-query($on-palm) {
+  body {
+    font-size: 0.9rem;
+  }
 }
 
 .side {
@@ -8,8 +28,15 @@ body {
 }
 
 .svg-container {
-  padding-top: 10%;
+  padding-top: 20vh;
 }
+
+@include media-query($on-palm) {
+  .svg-container {
+    padding-top: 50vh;
+  }
+}
+
 
 @import "globe";
 @import "header";

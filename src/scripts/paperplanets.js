@@ -179,6 +179,43 @@ d3.json('/static/countries.geojson', function(err, world) {
     tabsG.lower();
   });
 
+  var hookPos = [width * 0.2, 1];
+  var hookWidth = width / 10,
+    hookHeight = height / 20;
+
+  var hookG = svg.append("g")
+    .attr("transform", `translate(${hookPos[0]},${hookPos[1]})`);
+
+  // For hanging
+  hookG.append("rect")
+    .attr("width", hookWidth)
+    .attr("height", hookHeight)
+    .style("fill", "none")
+    .style("stroke", "black");
+
+  hookG.append("line")
+    .attr("x1", hookWidth / 4)
+    .attr("y1", 0)
+    .attr("x2", hookWidth / 4)
+    .attr("y2", hookHeight)
+    .style("stroke", "black")
+    .style('stroke-dasharray', '3');
+
+  hookG.append("line")
+    .attr("x1", hookWidth / 2)
+    .attr("y1", 0)
+    .attr("x2", hookWidth / 2)
+    .attr("y2", hookHeight)
+    .style("stroke", "black");
+
+  hookG.append("line")
+    .attr("x1", hookWidth * 3/4)
+    .attr("y1", 0)
+    .attr("x2", hookWidth * 3/4)
+    .attr("y2", hookHeight)
+    .style("stroke", "black")
+    .style('stroke-dasharray', '3');
+
 });
 
 };

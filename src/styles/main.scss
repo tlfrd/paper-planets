@@ -31,9 +31,20 @@ body {
   padding-top: 20vh;
 }
 
+.view-on-desktop {
+  display: none;
+}
+
 @include media-query($on-palm) {
   .svg-container {
-    padding-top: 50vh;
+    padding-top: 120vh;
+  }
+
+  .view-on-desktop {
+    display: block;
+    margin-bottom: 1rem;
+    color: red;
+    font-size: 1rem;
   }
 }
 

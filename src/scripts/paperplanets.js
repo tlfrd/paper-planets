@@ -1,4 +1,5 @@
 const d3 = require('d3');
+const d3Queue = require('d3-queue');
 const myriahedral = require('./myriahedral');
 const kruskal = require('./kruskal');
 const voronoi = require('d3-geo-voronoi');
@@ -113,15 +114,81 @@ d3.json('static/countries.geojson', function(err, world) {
 
   var countries = svg.append('g').attr('id', 'countries')
 
-  countries
-    .selectAll('path')
-    .data(world.features)
-    .enter()
-    .append('path')
-    .attr("d", path)
-    .style('fill', (_,i) => d3.schemeCategory20[i%20]);
+  var christmasColours = [
+    "#ff0000",
+    "#ff7878",
+    "#74d680",
+    "#378b29"
+  ];
 
-  projection.rotate([0,0,0])
+  var isoToCountry = {};
+  var countryToData = {};
+
+  var densityExtent = [],
+    temperatureExtent = [];
+
+  function calculatePositionInScale(value, extent) {
+    return (value - extent[0]) / (extent[1] - extent[0]);
+  }
+
+  d3Queue.queue()
+    .defer(d3.json, "static/country-data/country-by-iso-numeric.json")
+    .defer(d3.json, "static/country-data/country-by-population-density.json")
+    .defer(d3.json, "static/country-data/country-by-yearly-average-temperature.json")
+    .await(function(error, iso, popDen, temp) {
+      if (error) throw error;
+
+      densityExtent = d3.extent(popDen, d => d.density);
+      temperatureExtent = d3.extent(temp, d => d.temperature);
+
+      iso.forEach(i => {
+        isoToCountry[i.iso] = i.country;
+      });
+
+      popDen.forEach(i => {
+        if (countryToData[i.country]) {
+          countryToData[i.country].density = i.density;
+        } else {
+          countryToData[i.country] = {
+            pop_den: i.density
+          }
+        }
+      });
+
+      temp.forEach(i => {
+        if (countryToData[i.country]) {
+          countryToData[i.country].temp = i.temperature;
+        } else {
+          countryToData[i.country] = {
+            temp: i.temperature
+          }
+        }
+      });
+
+      countries
+        .selectAll('path')
+        .data(world.features)
+        .enter()
+        .append('path')
+        .attr("d", path)
+        .style('fill', (d,i) => {
+          var country = isoToCountry[d.properties.iso_n3];
+          if (countryToData[country]) {
+            if (countryToData[country].pop_den) {
+              d.properties.pop_den = calculatePositionInScale(countryToData[country].pop_den, densityExtent);
+              console.log(d.properties.pop_den);
+            }
+            if (countryToData[country].temp) {
+              d.properties.temp = calculatePositionInScale(countryToData[country].temp, temperatureExtent);
+              console.log(d.properties.temp);
+            }
+          }
+          return christmasColours[i%4];
+        });
+
+      projection.rotate([0,0,0]);
+    });
+
 
   var ko = k.features.map(d => {
     var x = d.coordinates.map(projection),

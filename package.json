@@ -23,6 +23,8 @@
     "d3": "^4.12.0",
     "d3-geo-polygon": "^1.0.1",
     "d3-geo-voronoi": "^0.0.5",
+    "d3-queue": "^3.0.7",
+    "d3-scale-chromatic": "^1.1.1",
     "handlebars": "^4.0.10",
     "union-find": "^1.0.2"
   },

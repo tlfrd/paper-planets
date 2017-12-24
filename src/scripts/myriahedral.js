@@ -66,7 +66,6 @@ function myriahedral(k, width, height, poly, faceProjection) {
 
   // console.log('faces', faces);
 
-
   // Polyhedral projection
   var proj = geoProjection.geoPolyhedral(faces[0], function(lambda, phi) {
       for (var i = 0; i < faces.length; i++) {
@@ -78,8 +77,8 @@ function myriahedral(k, width, height, poly, faceProjection) {
   .rotate([-8,0,-32])
   .fitExtent([[20,20],[width-20, height-20]], {type:"Sphere"})
 
-    proj.faces = faces;
-    return proj;
+  proj.faces = faces;
+  return proj;
 }
 
 module.exports = myriahedral;

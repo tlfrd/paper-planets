@@ -2,13 +2,14 @@ const d3 = require('d3');
 const myriahedral = require('./myriahedral');
 const kruskal = require('./kruskal');
 const voronoi = require('d3-geo-voronoi');
+const tabs = require('./tabs');
 
 module.exports = function() {
 
 var radians = Math.PI / 180,
   degrees = 1 / radians;
 
-d3.json('https://rawgit.com/visionscarto/some-geo-data/master/ne_110m_admin_0_countries/countries.geojson', function(err, world) {
+d3.json('/static/countries.geojson', function(err, world) {
 
   var width = 960, height = 500;
 
@@ -86,11 +87,14 @@ d3.json('https://rawgit.com/visionscarto/some-geo-data/master/ne_110m_admin_0_co
     v.polygons().features.map(d => d.geometry.coordinates[0])
   );
 
-  var faces = projection.faces;
+  var svg = d3.select("svg");
 
   var path = d3.geoPath().projection(projection);
 
-  var svg = d3.select("svg");
+  svg.append('path')
+    .attr('id', 'bgSphere')
+    .datum({ type: "Sphere" })
+    .attr('d', path);
 
   svg.append('path')
     .attr('id', 'sphere')
@@ -158,6 +162,36 @@ d3.json('https://rawgit.com/visionscarto/some-geo-data/master/ne_110m_admin_0_co
     .attr('transform', d => `translate(${projection(d.coordinates)})`)
     .attr('text-anchor', 'middle')
     .attr('dy', 5);
+
+  svg.append('path')
+    .attr('id', 'lineSphere')
+    .datum({ type: "Sphere" })
+    .attr('d', path);
+
+  svg.on('click', function() {
+    var coords = d3.mouse(this);
+    var inverted = projection.invert(coords);
+    console.log(inverted);
+  });
+
+  var tabsG = svg.append('g');
+
+  d3.json('/static/tabs.json', function(err2, t) {
+    t.tabs.forEach(tab => {
+      console.log(tab);
+      var projected1 = projection(tab.coordinates[0]),
+        projected2 = projection(tab.coordinates[1]);
+
+      var line1 = [
+        {x: projected1[0], y: projected1[1]},
+        {x: projected2[0], y: projected2[1]}
+      ];
+      console.log(tabs);
+      tabs.addTabs(tabsG, line1, 10, 0.1, tab.direction);
+    });
+
+    tabsG.lower();
+  });
 
 });
 

@@ -4,13 +4,25 @@
   fill: rgba(10,10,10,0.05);
 }
 
+#bgSphere {
+  stroke: black;
+  stroke-width: 1;
+  fill: white;
+}
+
+#lineSphere {
+  stroke: black;
+  stroke-width: 1;
+  fill: none;
+}
+
 .links path {
   stroke-width: 0
 }
 
 #countries path {
   fill: none;
-stroke: none;
+  stroke: none;
 }
 
 #graticule {
@@ -20,10 +32,10 @@ stroke: none;
 }
 
 .polygons {
-    stroke: #444;
+  stroke: #444;
 }
 
 .sites {
-    stroke: black;
-    fill: white;
+  stroke: black;
+  fill: white;
 }

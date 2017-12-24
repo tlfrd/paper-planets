@@ -6,3 +6,9 @@
 .title-edition {
   color: #ff0000;
 }
+
+@include media-query($on-palm) {
+  .header-title {
+    font-size: 1.2rem;
+  }
+}

@@ -1,5 +1,5 @@
 const d3 = require('d3');
-const geoProjection = require('d3-geo-projection');
+const geoProjection = require('./d3-geo-projection-clip-polyhedral');
 
 var radians = Math.PI / 180,
 degrees = 1 / radians;

@@ -53,7 +53,28 @@ module.exports = () => {
       countries
         .selectAll('path')
         .style('fill', 'black');
-    } else if (value === "population") {
+    } else if (value === "density") {
+      var countries = d3.select("#countries");
+      countries
+        .selectAll('path')
+        .style('fill', (d,i) => {
+          if (d.properties.pop_den) {
+            return scaleChromatic.interpolateGreens(d.properties.pop_den);
+          } else {
+            return scaleChromatic.interpolateGreens(0);
+          }
+        });
+    } else if (value === "temperature") {
+      var countries = d3.select("#countries");
+      countries
+        .selectAll('path')
+        .style('fill', (d,i) => {
+          if (d.properties.temp) {
+            return scaleChromatic.interpolateReds(d.properties.temp);
+          } else {
+            return "grey";
+          }
+        });
     }
 
   });

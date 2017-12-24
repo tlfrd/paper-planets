@@ -138,8 +138,8 @@ d3.json('static/countries.geojson', function(err, world) {
     .await(function(error, iso, popDen, temp) {
       if (error) throw error;
 
-      densityExtent = d3.extent(popDen, d => d.density);
-      temperatureExtent = d3.extent(temp, d => d.temperature);
+      densityExtent = d3.extent(popDen, d => +d.density);
+      temperatureExtent = d3.extent(temp, d => +d.temperature);
 
       iso.forEach(i => {
         isoToCountry[i.iso] = i.country;
@@ -147,20 +147,20 @@ d3.json('static/countries.geojson', function(err, world) {
 
       popDen.forEach(i => {
         if (countryToData[i.country]) {
-          countryToData[i.country].density = i.density;
+          countryToData[i.country].density = +i.density;
         } else {
           countryToData[i.country] = {
-            pop_den: i.density
+            pop_den: +i.density
           }
         }
       });
 
       temp.forEach(i => {
         if (countryToData[i.country]) {
-          countryToData[i.country].temp = i.temperature;
+          countryToData[i.country].temp = +i.temperature;
         } else {
           countryToData[i.country] = {
-            temp: i.temperature
+            temp: +i.temperature
           }
         }
       });
@@ -176,113 +176,109 @@ d3.json('static/countries.geojson', function(err, world) {
           if (countryToData[country]) {
             if (countryToData[country].pop_den) {
               d.properties.pop_den = calculatePositionInScale(countryToData[country].pop_den, densityExtent);
-              console.log(d.properties.pop_den);
             }
             if (countryToData[country].temp) {
               d.properties.temp = calculatePositionInScale(countryToData[country].temp, temperatureExtent);
-              console.log(d.properties.temp);
             }
           }
           return christmasColours[i%4];
         });
 
       projection.rotate([0,0,0]);
+
+      var ko = k.features.map(d => {
+        var x = d.coordinates.map(projection),
+            delta = [x[1][0]-x[0][0], x[1][1]-x[0][1]];
+        var angle = Math.atan2(delta[1], delta[0]),
+            len = Math.sqrt(delta[0]*delta[0] + delta[1]*delta[1]);
+        var A = 0.61803 /* g - 1 - epsilon */, B = 36 * radians;
+        var y0 = [x[0][0] + len * Math.cos(angle + B) * A,
+                  x[0][1] + len * Math.sin(angle + B) * A
+                ];
+        var y1 = [x[0][0] + len * Math.cos(angle - B) * A,
+                  x[0][1] + len * Math.sin(angle - B) * A
+                ];
+        return [y0,y1].map(projection.invert);
+      });
+
+      svg.append('g')
+        .selectAll('path')
+        .data([{type:"MultiLineString", coordinates: ko}])
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr('fill', 'none')
+        .attr('stroke', 'black')
+        .attr('stroke-width', 0.5)
+        .attr('stroke-dasharray', '3');
+
+      svg.append('path')
+        .attr('id', 'lineSphere')
+        .datum({ type: "Sphere" })
+        .attr('d', path);
+
+      // svg.on('click', function() {
+      //   var coords = d3.mouse(this);
+      //   var inverted = projection.invert(coords);
+      // });
+
+      var tabsG = svg.append('g');
+      var tabSize = width / 100;
+
+      d3.json('static/tabs.json', function(err2, t) {
+        t.tabs.forEach(tab => {
+
+          var projected1 = projection(tab.coordinates[0]),
+            projected2 = projection(tab.coordinates[1]);
+
+          var line1 = [
+            {x: projected1[0], y: projected1[1]},
+            {x: projected2[0], y: projected2[1]}
+          ];
+
+          tabs.addTabs(tabsG, line1, tabSize, 0.1, tab.direction);
+        });
+
+        tabsG.lower();
+      });
+
+      var hookPos = [width * 0.2, 1];
+      var hookWidth = width / 10,
+        hookHeight = height / 20;
+
+      var hookG = svg.append("g")
+        .attr("transform", `translate(${hookPos[0]},${hookPos[1]})`);
+
+      // For hanging
+      hookG.append("rect")
+        .attr("width", hookWidth)
+        .attr("height", hookHeight)
+        .style("fill", "none")
+        .style("stroke", "black");
+
+      hookG.append("line")
+        .attr("x1", hookWidth / 4)
+        .attr("y1", 0)
+        .attr("x2", hookWidth / 4)
+        .attr("y2", hookHeight)
+        .style("stroke", "black")
+        .style('stroke-dasharray', '3');
+
+      hookG.append("line")
+        .attr("x1", hookWidth / 2)
+        .attr("y1", 0)
+        .attr("x2", hookWidth / 2)
+        .attr("y2", hookHeight)
+        .style("stroke", "black");
+
+      hookG.append("line")
+        .attr("x1", hookWidth * 3/4)
+        .attr("y1", 0)
+        .attr("x2", hookWidth * 3/4)
+        .attr("y2", hookHeight)
+        .style("stroke", "black")
+        .style('stroke-dasharray', '3');
     });
-
-
-  var ko = k.features.map(d => {
-    var x = d.coordinates.map(projection),
-        delta = [x[1][0]-x[0][0], x[1][1]-x[0][1]];
-    var angle = Math.atan2(delta[1], delta[0]),
-        len = Math.sqrt(delta[0]*delta[0] + delta[1]*delta[1]);
-    var A = 0.61803 /* g - 1 - epsilon */, B = 36 * radians;
-    var y0 = [x[0][0] + len * Math.cos(angle + B) * A,
-              x[0][1] + len * Math.sin(angle + B) * A
-            ];
-    var y1 = [x[0][0] + len * Math.cos(angle - B) * A,
-              x[0][1] + len * Math.sin(angle - B) * A
-            ];
-    return [y0,y1].map(projection.invert);
-  });
-
-  svg.append('g')
-    .selectAll('path')
-    .data([{type:"MultiLineString", coordinates: ko}])
-    .enter()
-    .append('path')
-    .attr('d', path)
-    .attr('fill', 'none')
-    .attr('stroke', 'black')
-    .attr('stroke-width', 0.5)
-    .attr('stroke-dasharray', '3');
-
-  svg.append('path')
-    .attr('id', 'lineSphere')
-    .datum({ type: "Sphere" })
-    .attr('d', path);
-
-  // svg.on('click', function() {
-  //   var coords = d3.mouse(this);
-  //   var inverted = projection.invert(coords);
-  // });
-
-  var tabsG = svg.append('g');
-  var tabSize = width / 100;
-
-  d3.json('static/tabs.json', function(err2, t) {
-    t.tabs.forEach(tab => {
-
-      var projected1 = projection(tab.coordinates[0]),
-        projected2 = projection(tab.coordinates[1]);
-
-      var line1 = [
-        {x: projected1[0], y: projected1[1]},
-        {x: projected2[0], y: projected2[1]}
-      ];
-
-      tabs.addTabs(tabsG, line1, tabSize, 0.1, tab.direction);
-    });
-
-    tabsG.lower();
-  });
-
-  var hookPos = [width * 0.2, 1];
-  var hookWidth = width / 10,
-    hookHeight = height / 20;
-
-  var hookG = svg.append("g")
-    .attr("transform", `translate(${hookPos[0]},${hookPos[1]})`);
-
-  // For hanging
-  hookG.append("rect")
-    .attr("width", hookWidth)
-    .attr("height", hookHeight)
-    .style("fill", "none")
-    .style("stroke", "black");
-
-  hookG.append("line")
-    .attr("x1", hookWidth / 4)
-    .attr("y1", 0)
-    .attr("x2", hookWidth / 4)
-    .attr("y2", hookHeight)
-    .style("stroke", "black")
-    .style('stroke-dasharray', '3');
-
-  hookG.append("line")
-    .attr("x1", hookWidth / 2)
-    .attr("y1", 0)
-    .attr("x2", hookWidth / 2)
-    .attr("y2", hookHeight)
-    .style("stroke", "black");
-
-  hookG.append("line")
-    .attr("x1", hookWidth * 3/4)
-    .attr("y1", 0)
-    .attr("x2", hookWidth * 3/4)
-    .attr("y2", hookHeight)
-    .style("stroke", "black")
-    .style('stroke-dasharray', '3');
-
 });
 
 };

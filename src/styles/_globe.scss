@@ -1,0 +1,46 @@
+svg {
+  display: block;
+  margin: auto;
+}
+
+#sphere {
+  stroke: black;
+  stroke-width: 1;
+  fill: rgba(10,10,10,0.05);
+}
+
+#bgSphere {
+  stroke: black;
+  stroke-width: 1;
+  fill: white;
+}
+
+#lineSphere {
+  stroke: black;
+  stroke-width: 1;
+  fill: none;
+}
+
+.links path {
+  stroke-width: 0
+}
+
+#countries path {
+  fill: none;
+  stroke: none;
+}
+
+#graticule {
+  fill: none;
+  stroke: #aaa;
+  stroke-width: 0.5
+}
+
+.polygons {
+  stroke: #444;
+}
+
+.sites {
+  stroke: black;
+  fill: white;
+}

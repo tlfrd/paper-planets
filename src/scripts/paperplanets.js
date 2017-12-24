@@ -9,11 +9,16 @@ module.exports = function() {
 var radians = Math.PI / 180,
   degrees = 1 / radians;
 
+var ratio = 1.92;
+var maxWidth = 1500,
+  maxHeight = maxWidth / ratio;
+
 d3.json('/static/countries.geojson', function(err, world) {
 
-  var width = 960, height = 500;
+  var width = Math.min(window.innerWidth * 0.8, maxWidth),
+    height = Math.min(width / ratio, maxHeight);
 
-  d3.select("body").append("svg")
+  d3.select("svg")
     .attr("width", width)
     .attr("height", height);
 
@@ -144,41 +149,22 @@ d3.json('/static/countries.geojson', function(err, world) {
     .attr('stroke-width', 0.5)
     .attr('stroke-dasharray', '3');
 
-  svg.append('g')
-    .attr('class', 'sites')
-    .selectAll('circle')
-    .data(points.features)
-    .enter()
-    .append('circle')
-    .attr('transform', d => `translate(${projection(d.coordinates)})`)
-    .attr('r', 10);
-
-  svg.append('g')
-    .selectAll('text')
-    .data(points.features)
-    .enter()
-    .append('text')
-    .text((d,i) => i)
-    .attr('transform', d => `translate(${projection(d.coordinates)})`)
-    .attr('text-anchor', 'middle')
-    .attr('dy', 5);
-
   svg.append('path')
     .attr('id', 'lineSphere')
     .datum({ type: "Sphere" })
     .attr('d', path);
 
-  svg.on('click', function() {
-    var coords = d3.mouse(this);
-    var inverted = projection.invert(coords);
-    console.log(inverted);
-  });
+  // svg.on('click', function() {
+  //   var coords = d3.mouse(this);
+  //   var inverted = projection.invert(coords);
+  // });
 
   var tabsG = svg.append('g');
+  var tabSize = width / 100;
 
   d3.json('/static/tabs.json', function(err2, t) {
     t.tabs.forEach(tab => {
-      console.log(tab);
+
       var projected1 = projection(tab.coordinates[0]),
         projected2 = projection(tab.coordinates[1]);
 
@@ -186,8 +172,8 @@ d3.json('/static/countries.geojson', function(err, world) {
         {x: projected1[0], y: projected1[1]},
         {x: projected2[0], y: projected2[1]}
       ];
-      console.log(tabs);
-      tabs.addTabs(tabsG, line1, 10, 0.1, tab.direction);
+
+      tabs.addTabs(tabsG, line1, tabSize, 0.1, tab.direction);
     });
 
     tabsG.lower();

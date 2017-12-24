@@ -55,16 +55,12 @@ function myriahedral(k, width, height, poly, faceProjection) {
     });
   } while (search > 0);
 
-  // console.log('vertices', JSON.stringify(vertices));
-  // console.log('parents', JSON.stringify(parents));
-
   parents
   .forEach(function(d, i) {
     var node = faces[d];
     node && (node.children || (node.children = [])).push(faces[i]);
   });
 
-  // console.log('faces', faces);
 
   // Polyhedral projection
   var proj = geoProjection.geoPolyhedral(faces[0], function(lambda, phi) {

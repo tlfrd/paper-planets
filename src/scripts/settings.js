@@ -59,9 +59,9 @@ module.exports = () => {
         .selectAll('path')
         .style('fill', (d,i) => {
           if (d.properties.pop_den) {
-            return scaleChromatic.interpolateGreens(d.properties.pop_den);
+            return scaleChromatic.interpolateGreens(0.25 + 0.75 * d.properties.pop_den);
           } else {
-            return scaleChromatic.interpolateGreens(0);
+            return "#D3D3D3";
           }
         });
     } else if (value === "temperature") {
@@ -72,7 +72,7 @@ module.exports = () => {
           if (d.properties.temp) {
             return scaleChromatic.interpolateReds(d.properties.temp);
           } else {
-            return "grey";
+            return "#D3D3D3";
           }
         });
     }
